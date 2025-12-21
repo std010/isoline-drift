@@ -1,4 +1,0 @@
-E=load('ecg_original_with_rpeaks.txt');
-f = 2;
-t=E(:,1)/;
-noise=sin(t)
