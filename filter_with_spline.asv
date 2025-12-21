@@ -1,0 +1,61 @@
+step = 50;
+signal=load('ecg_polorised.txt');
+
+r_peak_indices = find(signal(:,3) == 1);
+interp_points_x = [];
+interp_points_y = [];
+
+for i = 1:length(r_peak_indices)
+    current_index = r_peak_indices(i);
+    if current_index > step  
+        point_index = current_index - step;
+        
+        interp_points_x = [interp_points_x; point_index];
+        interp_points_y = [interp_points_y; signal(point_index, 2)];
+    end
+end
+
+if ~isempty(interp_points_x)
+    if interp_points_x(1) ~= 1
+        interp_points_x = [1; interp_points_x];
+        interp_points_y = [signal(1, 2); interp_points_y];
+    end
+    if interp_points_x(end) ~= length(signal)
+        interp_points_x = [interp_points_x; length(signal)];
+        interp_points_y = [interp_points_y; signal(end, 2)];
+    end
+else
+    interp_points_x = [1; length(signal)];
+    interp_points_y = [signal(1, 2); signal(end, 2)];
+end
+
+
+x_interp = 1:length(signal(:,1));
+spline_values = interp1(interp_points_x_unique, interp_points_y_unique, x_interp, 'spline');
+
+% Создаем новый сигнал, вычитая сплайн
+new_signal = signal;
+new_signal(:,2) = new_signal(:,2) - spline_values';
+
+% Сохраняем результат
+dlmwrite('ecg_filtered_with_wpline.txt', new_signal, 'delimiter', '\t', 'precision', 6);
+
+% Визуализация для проверки (опционально)
+figure;
+subplot(2,1,1);
+plot(signal(:,1), signal(:,2), 'b');
+hold on;
+plot(signal(interp_points_x_unique,1), interp_points_y_unique, 'ro', 'MarkerSize', 8, 'LineWidth', 2);
+plot(signal(:,1), spline_values, 'r--', 'LineWidth', 1.5);
+title('Исходный сигнал и точки интерполяции');
+xlabel('Время');
+ylabel('Амплитуда');
+legend('Исходный сигнал', 'Точки интерполяции', 'Сплайн', 'Location', 'best');
+grid on;
+
+subplot(2,1,2);
+plot(new_signal(:,1), new_signal(:,2), 'g');
+title('Сигнал после вычитания сплайна');
+xlabel('Время');
+ylabel('Амплитуда');
+grid on;
