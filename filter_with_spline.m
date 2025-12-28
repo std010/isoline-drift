@@ -1,5 +1,7 @@
-step = 50;
-signal = load('ecg_polorised.txt');
+%step = 50; % для 1000 Гц
+step = 40; % для 200 Гц
+%signal = load('ecg_polorised.txt'); % тестовый сигнал с 1000 Гц
+signal = load('ECG_with_Rpeaks_200Hz.txt');
 
 r_peaks = find(signal(:,3) == 1);
 
@@ -28,27 +30,31 @@ new_signal = signal;
 new_signal(:,2) = new_signal(:,2) - spline_curve';
 
 
-dlmwrite('ecg_filtered_with_wpline.txt', new_signal, 'delimiter', '\t', 'precision', 6);
+dlmwrite('ecg_filtered_with_wpline_200hz.txt', new_signal, 'delimiter', '\t', 'precision', 6);
 
 
 
 % Исходный сигнал и сплайн
 figure('Position', [100, 100, 1000, 400]);
-subplot(1,2,1);
+subplot(2,1,1);
 plot(signal(:,1), signal(:,2), 'b', 'LineWidth', 1);
 hold on;
 plot(signal(:,1), spline_curve, 'r-', 'LineWidth', 2);
-plot(signal(x_points_unique,1), y_points_unique, 'mo', 'MarkerSize', 6);
+plot(signal(x_points,1), y_points, 'mo', 'MarkerSize', 6);
 title('Исходный сигнал и сплайн');
 xlabel('Время');
 ylabel('Амплитуда');
 legend('Сигнал', 'Сплайн', 'Точки', 'Location', 'best');
 grid on;
+xlim([0 10]);
+ylim([-0.6 0.6]);
 
 % Новый сигнал
-subplot(1,2,2);
-plot(new_signal(:,1), new_signal(:,2), 'g', 'LineWidth', 1.5);
+subplot(2,1,2);
+plot(new_signal(:,1), new_signal(:,2), 'b','LineWidth', 1);
 title('Сигнал после коррекции');
 xlabel('Время');
 ylabel('Амплитуда');
 grid on;
+xlim([0 10]);
+ylim([-0.6 0.6]);
