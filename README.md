@@ -4,4 +4,5 @@
 
 Авторы:
 std010
-Roman Chekhvalov 
+Roman Chekhvalov
+spitsynapolina
